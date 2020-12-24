@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Phones</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>All Phones <a th:href="@{/smartphones/create}">Create</a> </h1>
+<div>
+    <p>Here you can create new Smartphone:</p>
+    <div id="sPhoneFromResponse"></div>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Model</th>
+        <th>Price</th>
+        <th>Producer</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="phone : ${smartphones}">
+        <td th:text="*{phone.id}"></td>
+        <td th:text="*{phone.model}"></td>
+        <td th:text="*{phone.price}"></td>
+        <td th:text="*{phone.producer}"></td>
+        <td>
+            <a th:href="@{/smartphones/{id}/edit(id=*{phone.id})}">Edit</a>
+            <a th:href="@{/smartphones/{id}/delete(id=*{phone.id})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+       let deleteLink = $("a:contains('Delete')");
+       $(deleteLink).click(function (event) {
+          $.ajax({
+             url: $(event.target).attr("href"),
+             type: "POST",
+             beforeSend: function (xhr) {
+                 xhr.setRequestHeader("Accept", "application/json");
+                 xhr.setRequestHeader("Content-Type", "application/json");
+             },
+              success: function (smartphone) {
+                 let rowToDelete = $(event.target).closest("tr");
+                 rowToDelete.remove();
+                 let respContent = `<span class="success">Smart phone was deleted: [${smartphone.producer} + ${smartphone.model} + ${smartphone.price}]</span>`;
+                 $("#sPhoneFromResponse").html(respContent);
+              }
+          });
+          event.preventDefault();
+       });
+    });
+</script>
+</body>
+</html>
